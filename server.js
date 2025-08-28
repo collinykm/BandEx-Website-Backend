@@ -49,7 +49,7 @@ app.get('/getRecentPosts', async (req, res) => {
     const now = new Date();
 
     // Non-expired
-    const activePosts = await posts.find({expirationDate: {$gte: new Date()}}).sort({expirationDate: -1}).toArray()
+    const activePosts = await posts.find({expirationDate: {$gte: new Date()}}).sort({expirationDate: 1}).toArray()
     console.log(`found active posts:`, activePosts);
     // Expired (just 2)
     const expiredPosts = await posts.find({
