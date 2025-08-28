@@ -73,6 +73,6 @@ app.get('/getRecentPosts', async (req, res) => {
 });
 
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+app.listen(port, "192.168.1.72", () => {
+  console.log(`Server running on http://192.168.1.72:${port}`);
+});
