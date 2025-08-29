@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const port = 3000
-const { MongoClient } = require("mongodb")
+const { MongoClient, ObjectId} = require("mongodb")
 const cors = require("cors")
 
 app.use(cors())
@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.post('/newPost', (req, res) => {
+app.post('/newPost', async (req, res) => {
   const newPost = {
     title: req.body.title.trim(),
     message: req.body.message.trim(),
@@ -36,12 +36,44 @@ app.post('/newPost', (req, res) => {
     expirationDate: new Date(req.body.expirationDate)
   }
   try {
-    posts.insertOne(newPost)
+    await posts.insertOne(newPost)
   } catch (err) {
     console.error(err)
   }
   res.send('Success!')
 })
+
+app.put("/editPost", async (req, res) => {
+  const postId = new ObjectId(req.body.id)
+  console.log("postId ", postId)
+  const title = req.body.title.trim()
+  const message = req.body.message.trim()
+  const imageURL = req.body.imageURL
+  const expirationDate = new Date(req.body.expirationDate)
+
+  try {
+    const response = await posts.updateOne(
+      {_id: postId},
+      {$set: {
+        title: title,
+        message: message,
+        imageURL: imageURL,
+        expirationDate: expirationDate,
+        }
+      }
+    )
+    console.log(response)
+  } catch (err) {
+    console.log(err)
+  }
+  res.send('Success!')
+
+})
+
+
+
+
+
 
 app.get('/getRecentPosts', async (req, res) => {
   try {
@@ -50,7 +82,6 @@ app.get('/getRecentPosts', async (req, res) => {
 
     // Non-expired
     const activePosts = await posts.find({expirationDate: {$gte: new Date()}}).sort({expirationDate: 1}).toArray()
-    console.log(`found active posts:`, activePosts);
     // Expired (just 2)
     const expiredPosts = await posts.find({
       expirationDate: { $lt: now }
