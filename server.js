@@ -52,7 +52,7 @@ app.put("/editPost", async (req, res) => {
   const expirationDate = new Date(req.body.expirationDate)
 
   try {
-    const response = await posts.updateOne(
+    await posts.updateOne(
       {_id: postId},
       {$set: {
         title: title,
@@ -62,7 +62,6 @@ app.put("/editPost", async (req, res) => {
         }
       }
     )
-    console.log(response)
   } catch (err) {
     console.log(err)
   }
@@ -70,7 +69,16 @@ app.put("/editPost", async (req, res) => {
 
 })
 
-
+app.delete('/deletePost/:id', async (req, res) => {
+  const id = new ObjectId(req.params.id)
+  console.log("deleting this post:  ", id)
+  try {
+    await posts.deleteOne({"_id": id})
+  } catch (err) {
+    console.log(err)
+  }
+  res.send('Success!')
+})
 
 
 
