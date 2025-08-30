@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 
 app.post('/newPost', async (req, res) => {
   const newPost = {
-    title: req.body.title.trim(),
+    title: req.body.title?.trim() || null,
     message: req.body.message.trim(),
     imageURL: req.body.imageURL,
     createdAt: new Date(req.body.createdAt) ,
@@ -80,12 +80,8 @@ app.delete('/deletePost/:id', async (req, res) => {
   res.send('Success!')
 })
 
-
-
-
 app.get('/getRecentPosts', async (req, res) => {
   try {
-    console.log('Getting recent posts')
     const now = new Date();
 
     // Non-expired
@@ -110,6 +106,21 @@ app.get('/getRecentPosts', async (req, res) => {
     res.status(500).send("Error fetching posts");
   }
 });
+
+app.get('/getMorePosts', async (req, res) => {
+  const skip = Number(req.query.skip)
+  const limit = Number(req.query.limit)
+  try {
+    const expiredPosts = await posts.find({})
+      .sort({ expirationDate: -1 }) // sorting by most future
+      .skip(skip) //skipping the first offset number of results
+      .limit(limit)
+      .toArray();
+    res.json(expiredPosts);
+  } catch (err) {
+    console.log(err)
+  }
+})
 
 
 app.listen(port, "192.168.1.72", () => {
