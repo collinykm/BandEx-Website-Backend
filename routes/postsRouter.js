@@ -9,9 +9,9 @@ router.post('/newPost', async (req, res) => {
   const newPost = {
     title: req.body.title?.trim() || null,
     message: req.body.message.trim(),
-    imageURL: req.body.imageURL,
+    imageURL: req.body.imageURL?.trim() || "",
     createdAt: new Date(req.body.createdAt) ,
-    expirationDate: new Date(req.body.expirationDate)
+    eventDate: new Date(req.body.eventDate)
   }
   try {
     await posts.insertOne(newPost)
@@ -24,10 +24,10 @@ router.post('/newPost', async (req, res) => {
 router.put("/editPost", async (req, res) => {
   const postId = new ObjectId(req.body.id)
   console.log("postId ", postId)
-  const title = req.body.title.trim()
+  const title = req.body.title?.trim() || null
   const message = req.body.message.trim()
-  const imageURL = req.body.imageURL
-  const expirationDate = new Date(req.body.expirationDate)
+  const imageURL = req.body.imageURL?.trim() || ""
+  const eventDate = new Date(req.body.eventDate)
 
   try {
     await posts.updateOne(
@@ -36,7 +36,7 @@ router.put("/editPost", async (req, res) => {
           title: title,
           message: message,
           imageURL: imageURL,
-          expirationDate: expirationDate,
+          eventDate: eventDate,
         }
       }
     )
@@ -62,14 +62,14 @@ router.get('/getRecentPosts', async (req, res) => {
   try {
     const now = new Date();
 
-    const activePosts = await posts.find({expirationDate: {$gte: new Date()}}).sort({expirationDate: 1}).toArray()
+    const activePosts = await posts.find({eventDate: {$gte: new Date()}}).sort({eventDate: 1}).toArray()
 
-    const expiredPosts = await posts.find({expirationDate: { $lt: now }})
-      .sort({ expirationDate: -1 }) // most recently expired
+    const expiredPosts = await posts.find({eventDate: { $lt: now }})
+      .sort({ eventDate: -1 }) // most recently expired
       .limit(2)
       .toArray();
 
-    // Merge + sort by expirationDate ascending
+    // Merge + sort by eventDate ascending
     const allPosts = {upcoming: activePosts, expired: expiredPosts}
 
     res.json(allPosts);
@@ -84,7 +84,7 @@ router.get('/getMorePosts', async (req, res) => {
   const limit = Number(req.query.limit)
   try {
     const expiredPosts = await posts.find({})
-      .sort({ expirationDate: -1 }) // sorting by most future
+      .sort({ eventDate: -1 }) // sorting by most future
       .skip(skip) //skipping the first offset number of results
       .limit(limit)
       .toArray();
