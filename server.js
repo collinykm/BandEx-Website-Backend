@@ -4,6 +4,7 @@ import {connectDB} from "./db.js";
 import postsRouter from "./routes/postsRouter.js"
 import dotenv from "dotenv"
 import photosRouter from "./routes/photosRouter.js"
+import pagesRouter from "./routes/pagesRouter.js"
 
 const app = express()
 const port = 3000
@@ -15,6 +16,7 @@ dotenv.config()
 await connectDB()
 app.use("/posts", postsRouter)
 app.use("/photos", photosRouter)
+app.use("/pages", pagesRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
