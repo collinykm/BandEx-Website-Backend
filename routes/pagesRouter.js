@@ -5,7 +5,7 @@ import {ObjectId} from "mongodb"
 const router = Router();
 export default router;
 
-router.get("/getMentorshipDescriptions",  async (req, res) => {
+router.get("/getMentorshipInfo",  async (req, res) => {
   try {
     const mentorshipInfo = await pages.findOne({"page": "mentorship"})
     res.json(mentorshipInfo)
@@ -39,3 +39,31 @@ router.put("/updateMentorshipDescription",   async (req, res) => {
   }
 })
 
+
+router.get("/getApplicationsInfo",  async (req, res) => {
+  try {
+    const mentorshipInfo = await pages.findOne({"page": "applications"})
+    res.json(mentorshipInfo)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+router.put("/updateApplicationsInfo",   async (req, res) => {
+  console.log("updating applicationsInfo")
+  try {
+    const newMessage = req.body.message
+    const newLink = req.body.link
+    await pages.updateOne({"page": "applications"}, {
+        $set: {
+          "message": newMessage,
+          "link": newLink,
+        }
+      }
+    )
+    res.send('Success!')
+
+  } catch (error) {
+    console.log(error)
+  }
+})
