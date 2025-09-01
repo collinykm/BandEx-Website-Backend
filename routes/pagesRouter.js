@@ -67,3 +67,34 @@ router.put("/updateApplicationsInfo",   async (req, res) => {
     console.log(error)
   }
 })
+
+
+router.get("/getAboutInfo",  async (req, res) => {
+  try{
+    const info = await pages.findOne({"page": "about"})
+    res.json(info)
+  }  catch (error) {
+    console.log(error)
+  }
+})
+
+router.put("/updateAboutInfo",  async (req, res) => {
+  console.log("updating aboutInfo")
+  try {
+    const newDescription = req.body.description
+    const newMembers = req.body.members
+    const newPhotoURL = req.body.teamPhotoURL
+    const newCaption = req.body.caption
+    pages.updateOne({"page": "about"}, {
+      $set: {
+        "description": newDescription,
+        "members": newMembers,
+        "teamPhotoURL": newPhotoURL,
+        "caption": newCaption,
+      }
+    })
+  } catch (error) {
+    console.log(error)
+  }
+  res.send('Success!')
+})
